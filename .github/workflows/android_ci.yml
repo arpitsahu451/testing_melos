@@ -30,6 +30,10 @@ jobs:
           channel: 'stable'
           cache: true
 
+      # 4. NEW STEP: Inject the PAT into global Git config
+      - name: Configure Git Auth for Private Packages
+        run: git config --global url."https://${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
+
       # 4. Fetch Dependencies
       # Note: This step will automatically reach out to GitHub to get your plugin
       - name: Install dependencies
