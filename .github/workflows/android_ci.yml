@@ -1,0 +1,44 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout the App's code
+      - name: Checkout App Repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      # 2. Setup Java (Required for Android builds)
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3. Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      # 4. Fetch Dependencies
+      # Note: This step will automatically reach out to GitHub to get your plugin
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 5. Build Debug APK
+      - name: Build Debug APK
+        run: flutter build apk --debug
+
+      # 6. Build Release APK (Verifies Proguard/R8 and optimizations)
+      - name: Build Release APK
+        run: flutter build apk --release --no-codesign
